@@ -2,14 +2,29 @@ __author__ = 'DTKT'
 
 #IMPORTS
 import requests
+from sys import argv
+from time import sleep
 
 pricelistJita = []
 pricelistItamo = []
 
-def get_sell_order_crest():
-    json_market_data = requests.get("https://public-crest.eveonline.com/market/10000002/orders/sell/?type=https://public-crest.eveonline.com/types/3307/")
-    parsed_jason_market_data = json_market_data.json()
-    return parsed_jason_market_data
+
+def get_typeID_skillbooks():
+    with open("eve-skills-typeID.txt") as file:
+        typeID = [line.rstrip('\n') for line in file]
+    return typeID
+
+def get_sell_order_crest(typeID):
+
+    market_region = 10000002
+    market_order_type = sell
+    for skill_typeID in typeID:
+        current_typeID = skill_typeID
+        print current_typeID
+        json_market_data = requests.get("https://public-crest.eveonline.com/market/"+market_region+"/orders/"+market_order_type+"/?type=https://public-crest.eveonline.com/types/"+current_typeID+"/")
+        sleep(1) # Sleep time in seconds to not get fucked over by CREST API rate limits.
+        parsed_jason_market_data = json_market_data.json()
+        # return parsed_jason_market_data
 
 
 def sort_sell_order_prices(parsed_jason_market_data):
@@ -26,10 +41,8 @@ def sort_sell_order_prices(parsed_jason_market_data):
                 pricelistItamo.sort()
 
 
-    print "Here is the price list in Jita"
-    print min(pricelistJita)
-    print "Here is the price list in Itamo"
-    print max(pricelistItamo)
+    print "Here is the price list in Jita : %s" %min(pricelistJita)
+    print "Here is the price list in Itamo : %s"  %min(pricelistItamo)
 
     #Calculate price for the item
     item_profit = min(pricelistJita) - min(pricelistItamo)
@@ -38,7 +51,8 @@ def sort_sell_order_prices(parsed_jason_market_data):
     #print ("Total cost is: ISK {:,.2f}".format(item_profit))
 
 def main():
-    sort_sell_order_prices( get_sell_order_crest())
+    #sort_sell_order_prices( get_sell_order_crest())
+    get_sell_order_crest(get_typeID_skillbooks())
 
 if __name__ == "__main__":
     main()
