@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from progressbar import ProgressBar
 from requests import Session
 import json
+from skillbook_class import create_Skillbook
 
 __author__ = 'Laurent Dumont'
 
@@ -15,23 +16,6 @@ crest_url_list = []
 sell_orders_list = []
 pbar = ProgressBar()
 skillbook_list = []
-
-class Skillbook:
-    profit = 0
-    name = ""
-    price_jita = 0
-    price_itamo = 0
-
-    def __init__(self, profit, name, price_jita, price_itamo):
-        self.profit = profit
-        self.name = name
-        self.price_jita = price_jita
-        self.price_itamo = price_itamo
-
-def create_Skillbook(profit, name, price_jita, price_itamo):
-
-    skillbook = Skillbook(profit, name, price_jita, price_itamo)
-    return skillbook
 
 def get_typeID_skillbooks():
 
@@ -52,7 +36,6 @@ def get_sell_order_crest(typeID):
     for skill_typeID in typeID:
         current_typeID = skill_typeID
         crest_url_list.append("https://public-crest.eveonline.com/market/" + market_region + "/orders/" + market_order_type + "/?type=https://public-crest.eveonline.com/types/" + current_typeID + "/")
-    #print '\n'.join(str(p) for p in crest_url_list)
 
     print "Sending the requests"
     session = FuturesSession()
@@ -97,7 +80,6 @@ def sort_sell_order_prices(sell_orders_list):
 
         comma_item_profit = "ISK {:,.2f}".format(item_profit)
         skillbook_list.append(create_Skillbook(comma_item_profit,skillbook_name,min(price_list_jita),min(price_list_itamo)))
-        #print "Profit per skillbook for : %s - %s - Price in Itamo %s" %(skillbook_name,comma_item_profit,min(price_list_itamo))
         price_list_itamo[:] = []
         price_list_jita[:] = []
 
