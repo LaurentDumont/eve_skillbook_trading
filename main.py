@@ -12,6 +12,7 @@ price_list_jita = []
 price_list_itamo = []
 crest_url_list = []
 sell_orders_list = []
+item_profit_list = []
 session = FuturesSession(executor=ThreadPoolExecutor(max_workers=10))
 pbar = ProgressBar()
 
@@ -64,22 +65,22 @@ def get_sell_order_crest(typeID):
 
 
 def sort_sell_order_prices(sell_orders_list):
-    print '\n'.join(str(p) for p in sell_orders_list)
+    #print '\n'.join(str(p) for p in sell_orders_list)
     #If the JSON string is invalid, remove from the array and break
-    for sell_order in sell_orders_list:
+    for sell_order in sell_orders_list[:]:
         if sell_order["totalCount_str"] == "0":
-            print "Removing empty response"
-            print sell_order
+            #print "Removing empty response"
+            #print sell_order
             sell_orders_list.remove(sell_order)
             continue
     #Iterate through the Sell Orders list
-    print '\n'.join(str(p) for p in sell_orders_list)
-    for sell_order in sell_orders_list:
+    #print '\n'.join(str(p) for p in sell_orders_list)
+    for sell_order in sell_orders_list[:]:
         try:
             skillbook_name = sell_order["items"][0]["type"]["name"]
         except IndexError:
-            print sell_order
-            print "Cannot find the name - Probably an empty response"
+            #print "Cannot find the name - Probably an empty response"
+            #print sell_order
             sell_orders_list.remove(sell_order)
             continue
         #Iterate through the items to check the location
@@ -88,7 +89,6 @@ def sort_sell_order_prices(sell_orders_list):
             if sellOrder["location"]["name"] == "Jita IV - Moon 4 - Caldari Navy Assembly Plant":
                     price_list_jita.append(sellOrder["price"])
                     price_list_jita.sort()
-
             else:
                if sellOrder["location"]["name"] == "Itamo VI - Moon 6 - Science and Trade Institute School":
                     price_list_itamo.append(sellOrder["price"])
@@ -99,10 +99,9 @@ def sort_sell_order_prices(sell_orders_list):
         #print "Here is the price list in Itamo : %s"  %min(price_list_itamo)
 
         #Calculate price for the item
-        item_profit = min(price_list_jita) - min(price_list_itamo)
+        item_profit_list[] = min(price_list_jita) - min(price_list_itamo)
         comma_item_profit = "ISK {:,.2f}".format(item_profit)
-        #print "Here is the profit per skillbook for : %s - %s" %(skillbook_name,comma_item_profit)
-        #print ("Total cost is: ISK {:,.2f}".format(item_profit))
+        print "Here is the profit per skillbook for : %s - %s" %(skillbook_name,comma_item_profit)
 
 def main():
     sort_sell_order_prices(get_sell_order_crest(get_typeID_skillbooks()))
