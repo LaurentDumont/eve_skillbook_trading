@@ -1,9 +1,6 @@
 # IMPORTS
 import requests
-import grequests
-from sys import argv
 from time import sleep
-from sys import stdout
 from requests_futures.sessions import FuturesSession
 from concurrent.futures import ThreadPoolExecutor
 from progressbar import ProgressBar
@@ -15,7 +12,7 @@ price_list_jita = []
 price_list_itamo = []
 crest_url_list = []
 sell_orders_list = []
-# session = FuturesSession(executor=ThreadPoolExecutor(max_workers=10))
+session = FuturesSession(executor=ThreadPoolExecutor(max_workers=10))
 pbar = ProgressBar()
 
 def get_typeID_skillbooks():
@@ -40,10 +37,12 @@ def get_sell_order_crest(typeID):
 
     print "Sending the requests"
     for url in crest_url_list:
-        json_market_data = requests.get(url)
-        sleep(.5)
-        #print json_market_data._content
-        sell_orders_list.append(json.loads(json_market_data._content))
+        try:
+            json_market_data = requests.get(url)
+            sleep(.5)
+            sell_orders_list.append(json.loads(json_market_data._content))
+        except requests.ConnectionError:
+            print "Failed to connect to the EVE Crest"
     return sell_orders_list
 
     # For each URL, get the json response
@@ -65,16 +64,24 @@ def get_sell_order_crest(typeID):
 
 
 def sort_sell_order_prices(sell_orders_list):
-
+    print '\n'.join(str(p) for p in sell_orders_list)
     #If the JSON string is invalid, remove from the array and break
     for sell_order in sell_orders_list:
         if sell_order["totalCount_str"] == "0":
+            print "Removing empty response"
+            print sell_order
             sell_orders_list.remove(sell_order)
-            break
-
+            continue
     #Iterate through the Sell Orders list
+    print '\n'.join(str(p) for p in sell_orders_list)
     for sell_order in sell_orders_list:
-        skillbook_name = sell_order["items"][0]["type"]["name"]
+        try:
+            skillbook_name = sell_order["items"][0]["type"]["name"]
+        except IndexError:
+            print sell_order
+            print "Cannot find the name - Probably an empty response"
+            sell_orders_list.remove(sell_order)
+            continue
         #Iterate through the items to check the location
         for sellOrder in sell_order["items"]:
 
@@ -88,17 +95,16 @@ def sort_sell_order_prices(sell_orders_list):
                     price_list_itamo.sort()
 
 
-        print "Here is the price list in Jita : %s" %min(price_list_jita)
-        print "Here is the price list in Itamo : %s"  %min(price_list_itamo)
+        #print "Here is the price list in Jita : %s" %min(price_list_jita)
+        #print "Here is the price list in Itamo : %s"  %min(price_list_itamo)
 
         #Calculate price for the item
         item_profit = min(price_list_jita) - min(price_list_itamo)
         comma_item_profit = "ISK {:,.2f}".format(item_profit)
-        print "Here is the profit per skillbook for : %s - %s" %(skillbook_name,comma_item_profit)
+        #print "Here is the profit per skillbook for : %s - %s" %(skillbook_name,comma_item_profit)
         #print ("Total cost is: ISK {:,.2f}".format(item_profit))
 
 def main():
-    #sort_sell_order_prices( get_sell_order_crest())
     sort_sell_order_prices(get_sell_order_crest(get_typeID_skillbooks()))
 
 if __name__ == "__main__":
