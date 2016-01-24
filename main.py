@@ -12,7 +12,6 @@ price_list_jita = []
 price_list_itamo = []
 crest_url_list = []
 sell_orders_list = []
-item_profit_list = []
 session = FuturesSession(executor=ThreadPoolExecutor(max_workers=10))
 pbar = ProgressBar()
 
@@ -87,19 +86,24 @@ def sort_sell_order_prices(sell_orders_list):
         for sellOrder in sell_order["items"]:
 
             if sellOrder["location"]["name"] == "Jita IV - Moon 4 - Caldari Navy Assembly Plant":
-                    price_list_jita.append(sellOrder["price"])
-                    price_list_jita.sort()
+                    #price_list_jita.append(sellOrder["price"])
+                    price_jita = sellOrder["price"]
+                    continue
             else:
                if sellOrder["location"]["name"] == "Itamo VI - Moon 6 - Science and Trade Institute School":
-                    price_list_itamo.append(sellOrder["price"])
-                    price_list_itamo.sort()
+                    #price_list_itamo.append(sellOrder["price"])
+                    price_itamo = sellOrder["price"]
+                    continue
 
 
-        #print "Here is the price list in Jita : %s" %min(price_list_jita)
-        #print "Here is the price list in Itamo : %s"  %min(price_list_itamo)
+        # print "Here is the price list in Jita : %s" %min(price_jita)
+        # print "Here is the price list in Itamo : %s"  %min(price_list_itamo)
+        print "----------------------------"
+        print "Here is the price list in Jita : %s" %price_jita
+        print "Here is the price list in Itamo : %s"  %price_itamo
 
         #Calculate price for the item
-        item_profit_list[] = min(price_list_jita) - min(price_list_itamo)
+        item_profit = price_jita - price_itamo
         comma_item_profit = "ISK {:,.2f}".format(item_profit)
         print "Here is the profit per skillbook for : %s - %s" %(skillbook_name,comma_item_profit)
 
