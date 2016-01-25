@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 from progressbar import ProgressBar
 import json
 from skillbook_class import create_Skillbook
+import os
 
 __author__ = 'Laurent Dumont'
 
@@ -39,7 +40,7 @@ def get_sell_order_crest(typeID):
                 sell_orders_list.append(json.loads(temp.content))
             except requests.ConnectionError:
                 print "Connection Aborted - BadStatusLine"
-                
+
     # Static variables
     market_region = "10000002"
     market_order_type = "sell"
@@ -68,6 +69,8 @@ def sort_sell_order_prices(sell_orders_list):
             sell_orders_list.remove(sell_order)
             continue
         #Iterate through the items to check the location
+        price_list_itamo = []
+        price_list_jita = []
         for sellOrder in sell_order["items"][:]:
 
             if sellOrder["location"]["name"] == "Jita IV - Moon 4 - Caldari Navy Assembly Plant":
@@ -82,10 +85,7 @@ def sort_sell_order_prices(sell_orders_list):
         except ValueError:
             continue
 
-        comma_item_profit = "ISK {:,.2f}".format(item_profit)
-        skillbook_list.append(create_Skillbook(comma_item_profit,skillbook_name,min(price_list_jita),min(price_list_itamo)))
-        price_list_itamo[:] = []
-        price_list_jita[:] = []
+        skillbook_list.append(create_Skillbook(item_profit,skillbook_name,min(price_list_jita),min(price_list_itamo)))
 
     return skillbook_list
 
@@ -96,13 +96,14 @@ def print_result(skillbook_list):
     total = "Total number of valid skillbooks : %i \n" % skillbook_list.__len__()
     separator = "-------------------------------\n"
     file.write(total)
-
+    skillbook_list = sorted(skillbook_list, key=lambda skillbook: skillbook.profit, reverse=True)
     for skillbook in skillbook_list[:]:
         comma_price_itamo = "ISK {:,.2f}".format(skillbook.price_itamo)
-        profit_line = "With the skillbook %s - Profit : %s Itamo Cost : %s \n" %( skillbook.name, skillbook.profit, comma_price_itamo )
+        comma_price_jita = "ISK {:,.2f}".format(skillbook.price_jita)
+        comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
+        profit_line = "%s - Profit : %s Itamo Cost : %s | Jita Cost %s \n" %( skillbook.name, comma_item_profit, comma_price_itamo,comma_price_jita )
         file.write(profit_line)
         file.write(separator)
-
 
 def main():
         print_result(sort_sell_order_prices(get_sell_order_crest(get_typeID_skillbooks())))
