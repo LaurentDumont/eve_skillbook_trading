@@ -1,15 +1,16 @@
 # IMPORTS
 import requests
-from time import sleep
 from requests_futures.sessions import FuturesSession
 from concurrent.futures import ThreadPoolExecutor
 from progressbar import ProgressBar
 from requests import Session
 import json
 from skillbook_class import create_Skillbook
+from retrying import retry
 
 __author__ = 'Laurent Dumont'
 
+session = FuturesSession(executor=ThreadPoolExecutor(max_workers=10))
 price_list_jita = []
 price_list_itamo = []
 crest_url_list = []
@@ -27,6 +28,19 @@ def get_typeID_skillbooks():
 
 def get_sell_order_crest(typeID):
 
+    def make_api_call(crest_url_list):
+        print "Sending the requests"
+        session = FuturesSession()
+        session.mount("http://", requests.adapters.HTTPAdapter(max_retries=3))
+        session.mount("https://", requests.adapters.HTTPAdapter(max_retries=3))
+        for url in crest_url_list:
+            try:
+                print "Sending query..."
+                json_market_data = session.get(url)
+                temp = json_market_data.result()
+                sell_orders_list.append(json.loads(temp.content))
+            except requests.ConnectionError:
+                print "Connection Aborted - BadStatusLine"
     # Static variables
     market_region = "10000002"
     market_order_type = "sell"
@@ -37,16 +51,7 @@ def get_sell_order_crest(typeID):
         current_typeID = skill_typeID
         crest_url_list.append("https://public-crest.eveonline.com/market/" + market_region + "/orders/" + market_order_type + "/?type=https://public-crest.eveonline.com/types/" + current_typeID + "/")
 
-    print "Sending the requests"
-    session = FuturesSession()
-    for url in crest_url_list:
-        try:
-            json_market_data = session.get(url)
-            print "Sending query..."
-            temp = json_market_data.result()
-            sell_orders_list.append(json.loads(temp.content))
-        except requests.ConnectionError:
-            print "Failed to connect to the EVE Crest"
+    make_api_call(crest_url_list)
     return sell_orders_list
 
 def sort_sell_order_prices(sell_orders_list):
@@ -87,9 +92,17 @@ def sort_sell_order_prices(sell_orders_list):
 
 
 def print_result(skillbook_list):
-    print skillbook_list.__len__()
+
+    file = open("skillbook_profit.txt", 'w')
+    total = "Total number of valid skillbooks : %i \n" % skillbook_list.__len__()
+    separator = "-------------------------------\n"
+    file.write(total)
+
     for skillbook in skillbook_list[:]:
-        print skillbook.profit
+        comma_price_itamo = "ISK {:,.2f}".format(skillbook.price_itamo)
+        profit_line = "With the skillbook %s - Profit : %s Itamo Cost : %s \n" %( skillbook.name, skillbook.profit, comma_price_itamo )
+        file.write(profit_line)
+        file.write(separator)
 
 
 def main():
