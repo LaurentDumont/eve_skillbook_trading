@@ -3,10 +3,8 @@ import requests
 from requests_futures.sessions import FuturesSession
 from concurrent.futures import ThreadPoolExecutor
 from progressbar import ProgressBar
-from requests import Session
 import json
 from skillbook_class import create_Skillbook
-from retrying import retry
 
 __author__ = 'Laurent Dumont'
 
@@ -41,6 +39,7 @@ def get_sell_order_crest(typeID):
                 sell_orders_list.append(json.loads(temp.content))
             except requests.ConnectionError:
                 print "Connection Aborted - BadStatusLine"
+                
     # Static variables
     market_region = "10000002"
     market_order_type = "sell"
