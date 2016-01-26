@@ -1,3 +1,7 @@
 test:
   override:
     - python main.py
+
+general:
+  artifacts:
+    - "skillbook_profit.txt"
