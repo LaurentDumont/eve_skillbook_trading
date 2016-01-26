@@ -2,19 +2,17 @@
 import requests
 from requests_futures.sessions import FuturesSession
 from concurrent.futures import ThreadPoolExecutor
-from progressbar import ProgressBar
 import json
 from skillbook_class import create_Skillbook
-import os
+from tqdm import *
 
 __author__ = 'Laurent Dumont'
 
-session = FuturesSession(executor=ThreadPoolExecutor(max_workers=10))
+session = FuturesSession(executor=ThreadPoolExecutor(max_workers=100))
 price_list_jita = []
 price_list_itamo = []
 crest_url_list = []
 sell_orders_list = []
-pbar = ProgressBar()
 skillbook_list = []
 
 def get_typeID_skillbooks():
@@ -32,9 +30,8 @@ def get_sell_order_crest(typeID):
         session = FuturesSession()
         session.mount("http://", requests.adapters.HTTPAdapter(max_retries=3))
         session.mount("https://", requests.adapters.HTTPAdapter(max_retries=3))
-        for url in crest_url_list:
+        for url in tqdm(crest_url_list):
             try:
-                print "Sending query..."
                 json_market_data = session.get(url)
                 temp = json_market_data.result()
                 sell_orders_list.append(json.loads(temp.content))
@@ -53,6 +50,7 @@ def get_sell_order_crest(typeID):
 
     make_api_call(crest_url_list)
     return sell_orders_list
+
 
 def sort_sell_order_prices(sell_orders_list):
 
