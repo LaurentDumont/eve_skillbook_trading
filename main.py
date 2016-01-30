@@ -1,9 +1,10 @@
 # IMPORTS
 import requests
+import json
 from requests_futures.sessions import FuturesSession
 from concurrent.futures import ThreadPoolExecutor
-import json
 from skillbook_class import create_Skillbook
+from url_class import create_url
 from tqdm import *
 
 __author__ = 'Laurent Dumont'
@@ -26,6 +27,7 @@ def get_typeID_skillbooks():
 def get_sell_order_crest(typeID):
 
     def make_api_call(crest_url_list):
+        
         print "Sending the requests"
         session = FuturesSession()
         session.mount("http://", requests.adapters.HTTPAdapter(max_retries=3))
@@ -91,7 +93,7 @@ def sort_sell_order_prices(sell_orders_list):
 def print_result(skillbook_list):
 
     file = open("skillbook_profit.txt", 'w')
-    total = "Total number of valid skillbooks : %i \n" % skillbook_list.__len__()
+    total = "Total number of valid skillbooks : %i \n" % skillbook_list .__len__()
     separator = "-------------------------------\n"
     file.write(total)
     skillbook_list = sorted(skillbook_list, key=lambda skillbook: skillbook.profit, reverse=True)
@@ -99,7 +101,7 @@ def print_result(skillbook_list):
         comma_price_itamo = "ISK {:,.2f}".format(skillbook.price_itamo)
         comma_price_jita = "ISK {:,.2f}".format(skillbook.price_jita)
         comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
-        profit_line = "%s - Profit : %s Itamo Cost : %s | Jita Cost %s \n" %( skillbook.name, comma_item_profit, comma_price_itamo,comma_price_jita )
+        profit_line = "%s - Profit : %s \nItamo Cost : %s \nJita Cost %s \n" %( skillbook.name, comma_item_profit, comma_price_itamo,comma_price_jita )
         file.write(profit_line)
         file.write(separator)
 
