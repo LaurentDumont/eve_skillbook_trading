@@ -20,4 +20,4 @@ test:
   pre: 
     - touch conf/local.conf
   override: 
-    - play auto-test:
+    - play auto-test
