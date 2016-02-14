@@ -2,9 +2,11 @@
 import requests
 import json
 from requests_futures.sessions import FuturesSession
+import requests_futures
 from concurrent.futures import ThreadPoolExecutor
 from skillbook_class import create_Skillbook
 from url_class import create_url
+import time
 from tqdm import *
 
 __author__ = 'Laurent Dumont'
@@ -15,6 +17,22 @@ price_list_itamo = []
 crest_url_list = []
 sell_orders_list = []
 skillbook_list = []
+
+#
+def RateLimited(maxPerSecond):
+    minInterval = 1.0 / float(maxPerSecond)
+    def decorate(func):
+        lastTimeCalled = [0.0]
+        def rateLimitedFunction(*args,**kargs):
+            elapsed = time.clock() - lastTimeCalled[0]
+            leftToWait = minInterval - elapsed
+            if leftToWait>0:
+                time.sleep(leftToWait)
+            ret = func(*args,**kargs)
+            lastTimeCalled[0] = time.clock()
+            return ret
+        return rateLimitedFunction
+    return decorate
 
 def get_typeID_skillbooks():
 
@@ -27,18 +45,22 @@ def get_typeID_skillbooks():
 def get_sell_order_crest(typeID):
 
     def make_api_call(crest_url_list):
-        
-        print "Sending the requests"
-        session = FuturesSession()
-        session.mount("http://", requests.adapters.HTTPAdapter(max_retries=3))
-        session.mount("https://", requests.adapters.HTTPAdapter(max_retries=3))
-        for url in tqdm(crest_url_list):
+
+        @RateLimited(150)
+        def get_data(session,url):
             try:
-                json_market_data = session.get(url)
-                temp = json_market_data.result()
-                sell_orders_list.append(json.loads(temp.content))
+                response = session.get(url)
+                return response
             except requests.ConnectionError:
                 print "Connection Aborted - BadStatusLine"
+
+
+        print "Sending the requests"
+        session = FuturesSession(max_workers=10)
+        futures = []
+
+        for url in tqdm(crest_url_list, desc="Downloading", leave=True):
+            futures.append(get_data(session, url))
 
     # Static variables
     market_region = "10000002"
@@ -97,6 +119,7 @@ def print_result(skillbook_list):
     separator = "-------------------------------\n"
     file.write(total)
     skillbook_list = sorted(skillbook_list, key=lambda skillbook: skillbook.profit, reverse=True)
+
     for skillbook in skillbook_list[:]:
         comma_price_itamo = "ISK {:,.2f}".format(skillbook.price_itamo)
         comma_price_jita = "ISK {:,.2f}".format(skillbook.price_jita)
