@@ -4,7 +4,7 @@ import time
 import requests
 from objects.region_class import Region
 from objects.skillbook_class import Skillbook
-from objects.url_class import url
+from objects.url import url
 from objects.sellOrder import SellOrder
 from concurrent.futures import ThreadPoolExecutor
 from requests_futures.sessions import FuturesSession
