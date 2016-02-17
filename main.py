@@ -1,12 +1,13 @@
 # IMPORTS
-import requests
-import json
-from requests_futures.sessions import FuturesSession
-import requests_futures
-from concurrent.futures import ThreadPoolExecutor
-from skillbook_class import create_Skillbook
-from url_class import create_url
 import time
+
+import requests
+from objects.region_class import Region
+from objects.skillbook_class import Skillbook
+from objects.url_class import url
+from objects.sellOrder import SellOrder
+from concurrent.futures import ThreadPoolExecutor
+from requests_futures.sessions import FuturesSession
 from tqdm import *
 
 __author__ = 'Laurent Dumont'
@@ -18,7 +19,7 @@ crest_url_list = []
 sell_orders_list = []
 skillbook_list = []
 
-#
+#Decorator
 def RateLimited(maxPerSecond):
     minInterval = 1.0 / float(maxPerSecond)
     def decorate(func):
@@ -34,6 +35,7 @@ def RateLimited(maxPerSecond):
         return rateLimitedFunction
     return decorate
 
+#Get TYPEID from textfile
 def get_typeID_skillbooks():
 
     print "Reading the file for the typeID"
@@ -67,10 +69,18 @@ def get_sell_order_crest(typeID):
     market_order_type = "sell"
 
     # Create the list of all the urls to query with the correct typeID, region typeID and Sell or Buy Order type
+    market_region_id = {Region("10000002","jita"),Region("10000030","rens"),Region("10000032","dodixie"),Region("10000043","amarr"),Region("10000042","hek")}
+    #market_region_id = {create_region("10000002", "jita")}
+    market_order_type = "sell"
+
+    # Create the list of all the urls to query with the correct typeID, region typeID and Sell or Buy Order type
     print "Creating the LIST with the CREST url"
     for skill_typeID in typeID:
-        current_typeID = skill_typeID
-        crest_url_list.append("https://public-crest.eveonline.com/market/" + market_region + "/orders/" + market_order_type + "/?type=https://public-crest.eveonline.com/types/" + current_typeID + "/")
+        for region in market_region_id:
+            current_typeID = skill_typeID
+            crest_url_list.append(url(
+                "https://public-crest.eveonline.com/market/" + region.typeID + "/orders/" + market_order_type + "/?type=https://public-crest.eveonline.com/types/" + current_typeID + "/",
+                region.name))
 
     make_api_call(crest_url_list)
     return sell_orders_list
