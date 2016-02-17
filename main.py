@@ -38,10 +38,8 @@ def RateLimited(maxPerSecond):
 #Get TYPEID from textfile
 def get_typeID_skillbooks():
 
-    print "Reading the file for the typeID"
     with open("eve-skills-typeID.txt") as file:
         typeID = [line.rstrip('\n') for line in file]
-    print "Finished reading the file - Returning a LIST with all the typeID"
     return typeID
 
 def get_sell_order_crest(typeID):
@@ -51,30 +49,31 @@ def get_sell_order_crest(typeID):
         @RateLimited(150)
         def get_data(session,url):
             try:
-                response = session.get(url)
+                response = session.get(url.full_url)
                 return response
+
             except requests.ConnectionError:
                 print "Connection Aborted - BadStatusLine"
 
-
-        print "Sending the requests"
         session = FuturesSession(max_workers=10)
         futures = []
+        res = []
 
         for url in tqdm(crest_url_list, desc="Downloading", leave=True):
             futures.append(get_data(session, url))
 
-    # Static variables
-    market_region = "10000002"
-    market_order_type = "sell"
+        for request in tqdm(futures,desc="Completing Requests"):
+            res.append(request.result())
+        print res.__len__()
+        for x in res:
+            print x.content
 
     # Create the list of all the urls to query with the correct typeID, region typeID and Sell or Buy Order type
     market_region_id = {Region("10000002","jita"),Region("10000030","rens"),Region("10000032","dodixie"),Region("10000043","amarr"),Region("10000042","hek")}
-    #market_region_id = {create_region("10000002", "jita")}
+    #market_region_id = {Region("10000002","jita")}
     market_order_type = "sell"
 
     # Create the list of all the urls to query with the correct typeID, region typeID and Sell or Buy Order type
-    print "Creating the LIST with the CREST url"
     for skill_typeID in typeID:
         for region in market_region_id:
             current_typeID = skill_typeID
@@ -117,7 +116,7 @@ def sort_sell_order_prices(sell_orders_list):
         except ValueError:
             continue
 
-        skillbook_list.append(create_Skillbook(item_profit,skillbook_name,min(price_list_jita),min(price_list_itamo)))
+        skillbook_list.append(Skillbook(item_profit,skillbook_name,min(price_list_jita),min(price_list_itamo)))
 
     return skillbook_list
 
