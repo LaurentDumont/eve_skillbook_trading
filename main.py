@@ -9,10 +9,11 @@ from objects.sellOrder import SellOrder
 from concurrent.futures import ThreadPoolExecutor
 from requests_futures.sessions import FuturesSession
 from tqdm import *
+import json
 
 __author__ = 'Laurent Dumont'
 
-session = FuturesSession(executor=ThreadPoolExecutor(max_workers=100))
+session = FuturesSession(executor=ThreadPoolExecutor(max_workers=10))
 price_list_jita = []
 price_list_itamo = []
 crest_url_list = []
@@ -64,13 +65,16 @@ def get_sell_order_crest(typeID):
 
         for request in tqdm(futures,desc="Completing Requests"):
             res.append(request.result())
-        print res.__len__()
+
         for x in res:
-            print x.content
+            sell_orders_list.append(json.loads(x.content))
+
+        return sell_orders_list
+
 
     # Create the list of all the urls to query with the correct typeID, region typeID and Sell or Buy Order type
-    market_region_id = {Region("10000002","jita"),Region("10000030","rens"),Region("10000032","dodixie"),Region("10000043","amarr"),Region("10000042","hek")}
-    #market_region_id = {Region("10000002","jita")}
+    #market_region_id = {Region("10000002","jita"),Region("10000030","rens"),Region("10000032","dodixie"),Region("10000043","amarr"),Region("10000042","hek")}
+    market_region_id = {Region("10000002","jita")}
     market_order_type = "sell"
 
     # Create the list of all the urls to query with the correct typeID, region typeID and Sell or Buy Order type
@@ -81,8 +85,7 @@ def get_sell_order_crest(typeID):
                 "https://public-crest.eveonline.com/market/" + region.typeID + "/orders/" + market_order_type + "/?type=https://public-crest.eveonline.com/types/" + current_typeID + "/",
                 region.name))
 
-    make_api_call(crest_url_list)
-    return sell_orders_list
+    return make_api_call(crest_url_list)
 
 
 def sort_sell_order_prices(sell_orders_list):
