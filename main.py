@@ -10,6 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 from requests_futures.sessions import FuturesSession
 from tqdm import *
 import json
+import openpyxl
 
 __author__ = 'Laurent Dumont'
 
@@ -80,9 +81,9 @@ def get_sell_order_crest(typeID):
         return sell_orders_list
 
     # Create the list of all the urls to query with the correct typeID, region typeID and Sell or Buy Order type
-    #market_region_id = {Region("10000002", "jita")}
+    # market_region_id = {Region("10000002", "jita")}
     market_region_id = {Region("10000002", "jita"), Region("10000030", "rens"), Region("10000032", "dodixie"),
-    Region("10000043", "amarr"), Region("10000042", "hek")}
+                        Region("10000043", "amarr"), Region("10000042", "hek")}
     market_order_type = "sell"
 
     # Create the list of all the urls to query with the correct typeID, region typeID and Sell or Buy Order type
@@ -145,7 +146,7 @@ def sort_sell_order_prices(sell_orders_list):
                 pass
 
             skillbook_list.append(
-                Skillbook(item_profit, skillbook_name, min(price_list_trade), min(price_list_npc),sell_order.region))
+                Skillbook(item_profit, skillbook_name, min(price_list_trade), min(price_list_npc), sell_order.region))
         print skillbook_list.__len__()
         return skillbook_list
 
@@ -163,13 +164,13 @@ def sort_sell_order_prices(sell_orders_list):
 
         for sell_order in sell_orders_list[:]:
             if sell_order.region == "jita":
-                #calculate_profit(sell_order, jita_npc, jita_trade)
+                # calculate_profit(sell_order, jita_npc, jita_trade)
                 try:
                     skillbook_name = sell_order.data["items"][0]["type"]["name"]
                 except IndexError:
                     sell_orders_list.remove(sell_order)
                     continue
-                #Iterate through the items to check the location
+                # Iterate through the items to check the location
                 price_list_npc = []
                 price_list_trade = []
                 for sellOrder in sell_order.data["items"][:]:
@@ -186,16 +187,17 @@ def sort_sell_order_prices(sell_orders_list):
                 except ValueError:
                     continue
 
-                skillbook_list.append(Skillbook(item_profit,skillbook_name,min(price_list_npc),min(price_list_trade),sell_order.region))
+                skillbook_list.append(Skillbook(item_profit, skillbook_name, min(price_list_npc), min(price_list_trade),
+                                                sell_order.region))
 
             if sell_order.region == "amarr":
-                #calculate_profit(sell_order, amarr_npc, amarr_trade)
+                # calculate_profit(sell_order, amarr_npc, amarr_trade)
                 try:
                     skillbook_name = sell_order.data["items"][0]["type"]["name"]
                 except IndexError:
                     sell_orders_list.remove(sell_order)
                     continue
-                #Iterate through the items to check the location
+                # Iterate through the items to check the location
                 price_list_npc = []
                 price_list_trade = []
                 for sellOrder in sell_order.data["items"][:]:
@@ -212,16 +214,17 @@ def sort_sell_order_prices(sell_orders_list):
                 except ValueError:
                     continue
 
-                skillbook_list.append(Skillbook(item_profit,skillbook_name,min(price_list_trade),min(price_list_npc),sell_order.region))
+                skillbook_list.append(Skillbook(item_profit, skillbook_name, min(price_list_trade), min(price_list_npc),
+                                                sell_order.region))
 
             if sell_order.region == "rens":
-                #calculate_profit(sell_order, rens_npc, rens_trade)
+                # calculate_profit(sell_order, rens_npc, rens_trade)
                 try:
                     skillbook_name = sell_order.data["items"][0]["type"]["name"]
                 except IndexError:
                     sell_orders_list.remove(sell_order)
                     continue
-                #Iterate through the items to check the location
+                # Iterate through the items to check the location
                 price_list_npc = []
                 price_list_trade = []
                 for sellOrder in sell_order.data["items"][:]:
@@ -238,16 +241,17 @@ def sort_sell_order_prices(sell_orders_list):
                 except ValueError:
                     continue
 
-                skillbook_list.append(Skillbook(item_profit,skillbook_name,min(price_list_trade),min(price_list_npc),sell_order.region))
+                skillbook_list.append(Skillbook(item_profit, skillbook_name, min(price_list_trade), min(price_list_npc),
+                                                sell_order.region))
 
             if sell_order.region == "dodixie":
-                #calculate_profit(sell_order, dodixie_npc, dodixie_trade)
+                # calculate_profit(sell_order, dodixie_npc, dodixie_trade)
                 try:
                     skillbook_name = sell_order.data["items"][0]["type"]["name"]
                 except IndexError:
                     sell_orders_list.remove(sell_order)
                     continue
-                #Iterate through the items to check the location
+                # Iterate through the items to check the location
                 price_list_npc = []
                 price_list_trade = []
                 for sellOrder in sell_order.data["items"][:]:
@@ -264,16 +268,17 @@ def sort_sell_order_prices(sell_orders_list):
                 except ValueError:
                     continue
 
-                skillbook_list.append(Skillbook(item_profit,skillbook_name,min(price_list_trade),min(price_list_npc),sell_order.region))
+                skillbook_list.append(Skillbook(item_profit, skillbook_name, min(price_list_trade), min(price_list_npc),
+                                                sell_order.region))
 
             if sell_order.region == "hek":
-                #calculate_profit(sell_order, hek_npc, hek_trade)
+                # calculate_profit(sell_order, hek_npc, hek_trade)
                 try:
                     skillbook_name = sell_order.data["items"][0]["type"]["name"]
                 except IndexError:
                     sell_orders_list.remove(sell_order)
                     continue
-                #Iterate through the items to check the location
+                # Iterate through the items to check the location
                 price_list_npc = []
                 price_list_trade = []
                 for sellOrder in sell_order.data["items"][:]:
@@ -290,7 +295,8 @@ def sort_sell_order_prices(sell_orders_list):
                 except ValueError:
                     continue
 
-                skillbook_list.append(Skillbook(item_profit,skillbook_name,min(price_list_trade),min(price_list_npc),sell_order.region))
+                skillbook_list.append(Skillbook(item_profit, skillbook_name, min(price_list_trade), min(price_list_npc),
+                                                sell_order.region))
 
     print ("Cleaning invalid data")
     clean_sell_orders(sell_orders_list)
@@ -300,20 +306,65 @@ def sort_sell_order_prices(sell_orders_list):
 
 
 def print_result(skillbook_list):
-    file = open("skillbook_profit.txt", 'w')
+    file_jita = open("skillbook_profit_jita.txt", "w")
+    file_rens = open("skillbook_profit_rens.txt", "w")
+    file_dodixie = open("skillbook_profit_dodixie.txt", "w")
+    file_hek = open("skillbook_profit_hek.txt", "w")
+    file_amarr = open("skillbook_profit_amarr.txt", "w")
+    skillbook_list = sorted(skillbook_list, key=lambda skillbook: skillbook.profit, reverse=True)
     total = "Total number of valid skillbooks : %i \n" % skillbook_list.__len__()
     separator = "-------------------------------\n"
-    file.write(total)
-    skillbook_list = sorted(skillbook_list, key=lambda skillbook: skillbook.profit, reverse=True)
 
     for skillbook in skillbook_list[:]:
-        comma_price_npc= "ISK {:,.2f}".format(skillbook.price_npc)
-        comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
-        comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
-        profit_line = "%s - Profit : %s \nNPC Cost : %s \nTrade Cost %s \n" % (
-            skillbook.name, comma_item_profit, comma_price_npc, comma_price_trade)
-        file.write(profit_line)
-        file.write(separator)
+        if skillbook.region == "jita":
+            file_jita = open("skillbook_profit_jita.txt", "a")
+            comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
+            comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
+            comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
+            profit_line = "%s - Profit : %s %s \nNPC Cost : %s \nTrade Cost %s \n" % (
+                skillbook.name, comma_item_profit, skillbook.region, comma_price_npc, comma_price_trade)
+            file_jita.write(profit_line)
+            file_jita.write(separator)
+
+        if skillbook.region == "rens":
+            file_rens = open("skillbook_profit_rens.txt", "a")
+            comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
+            comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
+            comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
+            profit_line = "%s - Profit : %s %s \nNPC Cost : %s \nTrade Cost %s \n" % (
+                skillbook.name, comma_item_profit, skillbook.region, comma_price_npc, comma_price_trade)
+            file_rens.write(profit_line)
+            file_rens.write(separator)
+
+        if skillbook.region == "dodixie":
+            file_dodixie = open("skillbook_profit_dodixie.txt", "a")
+            comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
+            comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
+            comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
+            profit_line = "%s - Profit : %s %s \nNPC Cost : %s \nTrade Cost %s \n" % (
+                skillbook.name, comma_item_profit, skillbook.region, comma_price_npc, comma_price_trade)
+            file_dodixie.write(profit_line)
+            file_dodixie.write(separator)
+
+        if skillbook.region == "hek":
+            file_hek = open("skillbook_profit_hek.txt", "a")
+            comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
+            comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
+            comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
+            profit_line = "%s - Profit : %s %s \nNPC Cost : %s \nTrade Cost %s \n" % (
+                skillbook.name, comma_item_profit, skillbook.region, comma_price_npc, comma_price_trade)
+            file_hek.write(profit_line)
+            file_hek.write(separator)
+
+        if skillbook.region == "amarr":
+            file_amarr = open("skillbook_profit_amarr.txt", "a")
+            comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
+            comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
+            comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
+            profit_line = "%s - Profit : %s %s \nNPC Cost : %s \nTrade Cost %s \n" % (
+                skillbook.name, comma_item_profit, skillbook.region, comma_price_npc, comma_price_trade)
+            file_amarr.write(profit_line)
+            file_amarr.write(separator)
 
 
 def main():
