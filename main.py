@@ -187,7 +187,7 @@ def sort_sell_order_prices(sell_orders_list):
                 except ValueError:
                     continue
 
-                skillbook_list.append(Skillbook(item_profit, skillbook_name, min(price_list_npc), min(price_list_trade),
+                skillbook_list.append(Skillbook(item_profit, skillbook_name, min(price_list_trade), min(price_list_npc),
                                                 sell_order.region))
 
             if sell_order.region == "amarr":
@@ -306,23 +306,19 @@ def sort_sell_order_prices(sell_orders_list):
 
 
 def print_result(skillbook_list):
-    file_jita = open("skillbook_profit_jita.txt", "w")
-    file_rens = open("skillbook_profit_rens.txt", "w")
-    file_dodixie = open("skillbook_profit_dodixie.txt", "w")
-    file_hek = open("skillbook_profit_hek.txt", "w")
-    file_amarr = open("skillbook_profit_amarr.txt", "w")
     skillbook_list = sorted(skillbook_list, key=lambda skillbook: skillbook.profit, reverse=True)
     total = "Total number of valid skillbooks : %i \n" % skillbook_list.__len__()
     separator = "-------------------------------\n"
 
+    # THIS COULD GO INTO A REALLY NICE OOP FUNCTION YOU KNOW :D
     for skillbook in skillbook_list[:]:
         if skillbook.region == "jita":
             file_jita = open("skillbook_profit_jita.txt", "a")
             comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
             comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
             comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
-            profit_line = "%s - Profit : %s %s \nNPC Cost : %s \nTrade Cost %s \n" % (
-                skillbook.name, comma_item_profit, skillbook.region, comma_price_npc, comma_price_trade)
+            profit_line = "%s - Profit : %s \nNPC Cost : %s \nTrade Cost %s \n" % (
+                skillbook.name, comma_item_profit, comma_price_npc, comma_price_trade)
             file_jita.write(profit_line)
             file_jita.write(separator)
 
@@ -331,8 +327,8 @@ def print_result(skillbook_list):
             comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
             comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
             comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
-            profit_line = "%s - Profit : %s %s \nNPC Cost : %s \nTrade Cost %s \n" % (
-                skillbook.name, comma_item_profit, skillbook.region, comma_price_npc, comma_price_trade)
+            profit_line = "%s - Profit : %s \nNPC Cost : %s \nTrade Cost %s \n" % (
+                skillbook.name, comma_item_profit, comma_price_npc, comma_price_trade)
             file_rens.write(profit_line)
             file_rens.write(separator)
 
@@ -341,8 +337,8 @@ def print_result(skillbook_list):
             comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
             comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
             comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
-            profit_line = "%s - Profit : %s %s \nNPC Cost : %s \nTrade Cost %s \n" % (
-                skillbook.name, comma_item_profit, skillbook.region, comma_price_npc, comma_price_trade)
+            profit_line = "%s - Profit : %s \nNPC Cost : %s \nTrade Cost %s \n" % (
+                skillbook.name, comma_item_profit, comma_price_npc, comma_price_trade)
             file_dodixie.write(profit_line)
             file_dodixie.write(separator)
 
@@ -351,8 +347,8 @@ def print_result(skillbook_list):
             comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
             comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
             comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
-            profit_line = "%s - Profit : %s %s \nNPC Cost : %s \nTrade Cost %s \n" % (
-                skillbook.name, comma_item_profit, skillbook.region, comma_price_npc, comma_price_trade)
+            profit_line = "%s - Profit : %s \nNPC Cost : %s \nTrade Cost %s \n" % (
+                skillbook.name, comma_item_profit, comma_price_npc, comma_price_trade)
             file_hek.write(profit_line)
             file_hek.write(separator)
 
@@ -361,8 +357,8 @@ def print_result(skillbook_list):
             comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
             comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
             comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
-            profit_line = "%s - Profit : %s %s \nNPC Cost : %s \nTrade Cost %s \n" % (
-                skillbook.name, comma_item_profit, skillbook.region, comma_price_npc, comma_price_trade)
+            profit_line = "%s - Profit : %s \nNPC Cost : %s \nTrade Cost %s \n" % (
+                skillbook.name, comma_item_profit, comma_price_npc, comma_price_trade)
             file_amarr.write(profit_line)
             file_amarr.write(separator)
 
