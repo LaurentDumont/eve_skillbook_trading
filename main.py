@@ -202,10 +202,10 @@ def sort_sell_order_prices(sell_orders_list):
                 price_list_trade = []
                 for sellOrder in sell_order.data["items"][:]:
 
-                    if sellOrder["location"]["name"] == amarr_npc:
+                    if sellOrder["location"]["name"] == amarr_trade:
                         price_list_trade.append(sellOrder["price"])
 
-                    if sellOrder["location"]["name"] == amarr_trade:
+                    if sellOrder["location"]["name"] == amarr_npc:
                         price_list_npc.append(sellOrder["price"])
 
                 # Calculate price for the item
