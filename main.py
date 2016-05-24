@@ -10,7 +10,6 @@ from concurrent.futures import ThreadPoolExecutor
 from requests_futures.sessions import FuturesSession
 from tqdm import *
 import json
-import openpyxl
 
 __author__ = 'Laurent Dumont'
 
@@ -55,7 +54,7 @@ def get_typeID_skillbooks():
 def get_sell_order_crest(typeID):
     def make_api_call(crest_url_list):
 
-        @RateLimited(150)
+        #@RateLimited(150)
         def get_data(session, url):
             try:
                 response = session.get(url.full_url)
