@@ -90,7 +90,7 @@ def get_sell_order_crest(typeID):
         for region in market_region_id:
             current_typeID = skill_typeID
             crest_url_list.append(url(
-                "https://crest-tq.eveonline.com/market/" + region.typeID + "/orders/" + market_order_type + "/?type=https://public-crest.eveonline.com/types/" + current_typeID + "/",
+                "https://crest-tq.eveonline.com/market/" + region.typeID + "/orders/" + market_order_type + "/?type=https://public-crest.eveonline.com/inventory/types/" + current_typeID + "/",
                 region.name))
 
     return make_api_call(crest_url_list)
