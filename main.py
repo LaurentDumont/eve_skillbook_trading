@@ -46,7 +46,7 @@ def RateLimited(maxPerSecond):
 
 # Get TYPEID from textfile
 def get_typeID_skillbooks():
-    with open("eve-skills-typeID.txt") as file:
+    with open("/opt/eve_skillbook_trading/eve-skills-typeID.txt") as file:
         typeID = [line.rstrip('\n') for line in file]
     return typeID
 
@@ -310,9 +310,15 @@ def print_result(skillbook_list):
     separator = "-------------------------------\n"
 
     # THIS COULD GO INTO A REALLY NICE OOP FUNCTION YOU KNOW :D
+    file_jita = open("/var/www/skillbook/skillbooks/skillbook_profit_jita.txt", "w")
+    file_rens = open("/var/www/skillbook/skillbooks/skillbook_profit_rens.txt", "w")
+    file_dodixie = open("/var/www/skillbook/skillbooks/skillbook_profit_dodixie.txt", "w")
+    file_hek = open("/var/www/skillbook/skillbooks/skillbook_profit_hek.txt", "w")
+    file_amarr = open("/var/www/skillbook/skillbooks/skillbook_profit_amarr.txt", "w")
+
+
     for skillbook in skillbook_list[:]:
         if skillbook.region == "jita":
-            file_jita = open("skillbook_profit_jita.txt", "a")
             comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
             comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
             comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
@@ -322,7 +328,6 @@ def print_result(skillbook_list):
             file_jita.write(separator)
 
         if skillbook.region == "rens":
-            file_rens = open("skillbook_profit_rens.txt", "a")
             comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
             comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
             comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
@@ -332,7 +337,6 @@ def print_result(skillbook_list):
             file_rens.write(separator)
 
         if skillbook.region == "dodixie":
-            file_dodixie = open("skillbook_profit_dodixie.txt", "a")
             comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
             comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
             comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
@@ -342,7 +346,6 @@ def print_result(skillbook_list):
             file_dodixie.write(separator)
 
         if skillbook.region == "hek":
-            file_hek = open("skillbook_profit_hek.txt", "a")
             comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
             comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
             comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
@@ -352,7 +355,6 @@ def print_result(skillbook_list):
             file_hek.write(separator)
 
         if skillbook.region == "amarr":
-            file_amarr = open("skillbook_profit_amarr.txt", "a")
             comma_price_npc = "ISK {:,.2f}".format(skillbook.price_npc)
             comma_price_trade = "ISK {:,.2f}".format(skillbook.price_trade)
             comma_item_profit = "ISK {:,.2f}".format(skillbook.profit)
